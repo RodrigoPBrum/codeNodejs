@@ -4,27 +4,37 @@
   2 Obter o endereco do usuario pelo Id
  */
 
-function getUser(callback) {
-  setTimeout(function () {
-    return callback(null, {
-      id: 1,
-      name: 'Aladin',
-      birthDate: new Date()
-    })
-  }, 1000);
+function getUser() {
+  //when error occurs -> reject(Error)
+  //when sucess -> RESOLV
+  return new Promise(function solvePromise(resolve, reject) {
+    setTimeout(function () {
+      // return reject(new Error('DEU RUIM DE VERDADE!'))
+      return resolve({
+        id: 1,
+        name: 'Aladin',
+        birthDate: new Date()
+      })
+    }, 1000);
+    
+  })
 }
 
-function getPhone(UserId, callback) {
-  setTimeout(() => {
-    return callback(null, {
-      phone: '1199002',
-      ddd: 11
-    })
-  }, 2000);
+function getPhone(UserId) {
+  return new Promise(function solvePromise(resolve, reject) {
+    setTimeout(() => {
+      return resolve(null, {
+        phone: '1199002',
+        ddd: 11
+      })
+    }, 2000);
+    
+  })
 }
 
 function getAddress (UserId, callback) {
   setTimeout(() => {
+
     return callback(null, {
       street: 'dos bobos',
       number: 0
@@ -32,35 +42,51 @@ function getAddress (UserId, callback) {
   }, 2000);
 }
 
-function solveUser(err, user) {
-  console.log('usuario', user)
-  
-}
+const userPromise = getUser()
 
-getUser(function solveUser(err, user) {
-  //null|| "" || 0 === false
-  if (err) {
-    console.log('DEU RUIM em USUARIO', err)
-    return;
-  }
-  getPhone(user.id, function solvePhone(err1, phone) {
-    if (err1) {
-      console.log('DEU RUIM em TELEFONE', err1)
-      return;
-    }
-    getAddress(user.id, function solveAddress(err2, address) {
-      if (err2) {
-        console.log('DEU RUIM em ENDERECO', err2)
-        return;
-      }
-      console.log(`
-      Nome ${user.name},
-      Endereco ${address.street}, ${address.number}
-      Telefone ${phone.ddd}, ${phone.phone}
-      `)
-    })
+userPromise
+  .then(function (user) {
+    return getPhone(user.id)
   })
-})
+  .then(function (result) {
+    console.log('resultado', result)
+  })
+  .catch(function (error) {
+    console.error('DEU RUIM', error)
+  })
+
+// function solveUser(err, user) {
+//   console.log('usuario', user)
+  
+// }
+
+//to manipulate success we use the function .then
+//to manipulate errors, we use the .catch
+
+// getUser(function solveUser(err, user) {
+//   //null|| "" || 0 === false
+//   if (err) {
+//     console.log('DEU RUIM em USUARIO', err)
+//     return;
+//   }
+//   getPhone(user.id, function solvePhone(err1, phone) {
+//     if (err1) {
+//       console.log('DEU RUIM em TELEFONE', err1)
+//       return;
+//     }
+//     getAddress(user.id, function solveAddress(err2, address) {
+//       if (err2) {
+//         console.log('DEU RUIM em ENDERECO', err2)
+//         return;
+//       }
+//       console.log(`
+//       Nome ${user.name},
+//       Endereco ${address.street}, ${address.number}
+//       Telefone ${phone.ddd}, ${phone.phone}
+//       `)
+//     })
+//   })
+// })
 // const phone = getPhone(user.id)
 
 // console.log('telefone', phone)
