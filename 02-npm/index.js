@@ -3,6 +3,9 @@
   1 Obter o numero de telefone de um usuario a partir de seu Id
   2 Obter o endereco do usuario pelo Id
  */
+//importamos um modulo interno do node.js
+const util = require('util')
+const getAsyncAddress = util.promisify(getAddress)
 
 function getUser() {
   //when error occurs -> reject(Error)
@@ -23,7 +26,7 @@ function getUser() {
 function getPhone(UserId) {
   return new Promise(function solvePromise(resolve, reject) {
     setTimeout(() => {
-      return resolve(null, {
+      return resolve({
         phone: '1199002',
         ddd: 11
       })
@@ -34,7 +37,6 @@ function getPhone(UserId) {
 
 function getAddress (UserId, callback) {
   setTimeout(() => {
-
     return callback(null, {
       street: 'dos bobos',
       number: 0
@@ -43,13 +45,36 @@ function getAddress (UserId, callback) {
 }
 
 const userPromise = getUser()
-
+//user -> phone -> phone
 userPromise
   .then(function (user) {
     return getPhone(user.id)
+    .then(function solvePhone(result) {
+      return {
+        user: {
+          name:user.name,
+          id:user.id
+        },
+        phone: result
+      }
+    })
   })
-  .then(function (result) {
-    console.log('resultado', result)
+  .then(function (resultado) {
+    const address = getAsyncAddress(resultado.user.id)
+    return address.then(function solveAddress(result) {
+      return {
+        user: resultado.user,
+        phone:resultado.phone,
+        address: result
+      }
+    })
+  })
+  .then(function (resultado) {
+    console.log(`
+      Nome: ${resultado.user.name}
+      Endereco: ${resultado.address.street}, ${resultado.address.number}
+      Telefone: (${resultado.phone.ddd}) ${resultado.phone.phone}
+    `)
   })
   .catch(function (error) {
     console.error('DEU RUIM', error)
